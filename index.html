@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
+    <title>Mochi Cat - Trò Chơi Nuôi Mèo Ảo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#FFE5EC',
+                            rose: '#FFB3C6',
+                            peach: '#FFD7BA',
+                            cream: '#FFF9F0',
+                            lavender: '#E8EAFF',
+                            mint: '#D8F3DC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-pink-100 via-orange-50 to-blue-100 min-h-screen text-slate-800 flex flex-col justify-between selection:bg-pink-300">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full max-w-3xl mx-auto p-3 sm:p-4 z-40">
+        <div class="glass-panel rounded-3xl p-3 sm:px-5 flex items-center justify-between shadow-sm">
+            <!-- Cat Profile & Level -->
+            <div class="flex items-center gap-3">
+                <div class="relative group cursor-pointer" id="btnEditName">
+                    <div class="flex items-center gap-1.5">
+                        <span id="catNameDisplay" class="font-bold text-lg sm:text-xl text-pink-600 tracking-wide">Mochi</span>
+                        <span class="text-xs text-pink-400 group-hover:scale-110 transition-transform">✏️</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="levelBadge" class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Cấp 1</span>
+                        <!-- Mini Exp Bar -->
+                        <div class="w-16 sm:w-20 bg-pink-100 rounded-full h-1.5 overflow-hidden">
+                            <div id="expBar" class="bg-pink-400 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Controls: Coins, Wardrobe, Audio, Reset -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <!-- Coins -->
+                <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-1 rounded-2xl text-amber-700 font-bold text-xs sm:text-sm shadow-inner">
+                    <span>🪙</span>
+                    <span id="coinsDisplay">50</span>
+                </div>
+
+                <!-- Wardrobe Button -->
+                <button id="btnWardrobe" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-purple-100 hover:bg-purple-200 text-purple-700 flex items-center justify-center text-lg shadow-sm transition-transform active:scale-95" title="Tủ đồ & Phụ kiện">
+                    🎀
+                </button>
+
+                <!-- Audio Toggle -->
+                <button id="btnAudioToggle" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center text-lg shadow-sm transition-transform active:scale-95" title="Bật/Tắt âm thanh">
+                    🔊
+                </button>
+
+                <!-- Reset Game -->
+                <button id="btnReset" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-500 flex items-center justify-center text-base shadow-sm transition-transform active:scale-95" title="Đặt lại trò chơi">
+                    🔄
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Room Stage -->
+    <main class="flex-1 w-full max-w-3xl mx-auto px-3 sm:px-4 flex flex-col justify-center items-center relative">
+        <div id="gameStage" class="room-container w-full h-[380px] sm:h-[440px] rounded-3xl relative overflow-hidden shadow-2xl flex flex-col justify-end items-center border-4 border-white/80 transition-colors duration-700" 
+             style="background: radial-gradient(circle at 50% 20%, #FFF8EE 0%, #FED7AA 100%);">
+            
+            <!-- Room Background Wall Elements -->
+            
+            <!-- Window with Day/Night Animated View -->
+            <div class="absolute top-4 left-6 sm:left-12 w-28 h-36 sm:w-36 sm:h-44 rounded-t-full border-4 border-white shadow-md overflow-hidden z-0">
+                <!-- Sky -->
+                <div class="window-sky absolute inset-0 transition-colors duration-1000" style="background: linear-gradient(to bottom, #93C5FD 0%, #E0F2FE 100%);">
+                    <!-- Day Sun & Clouds -->
+                    <div class="window-sun absolute top-3 right-3 w-8 h-8 rounded-full bg-yellow-300 shadow-[0_0_15px_#FDE047] transition-all duration-700"></div>
+                    <div class="window-sun cloud-1 absolute top-8 left-0 text-white/80 text-xl">☁️</div>
+                    <div class="window-sun cloud-2 absolute top-16 left-4 text-white/70 text-lg">☁️</div>
+
+                    <!-- Night Moon & Stars -->
+                    <div class="window-moon absolute top-3 right-4 text-2xl transition-all duration-700 opacity-0 scale-50">🌙</div>
+                    <div class="window-stars absolute inset-0 opacity-0 transition-opacity duration-700">
+                        <span class="absolute top-4 left-4 text-amber-200 text-xs star-1">✦</span>
+                        <span class="absolute top-12 left-10 text-white text-xs star-2">★</span>
+                        <span class="absolute top-8 right-10 text-amber-100 text-xs star-3">✦</span>
+                        <span class="absolute top-20 left-6 text-white text-[10px] star-4">★</span>
+                    </div>
+                </div>
+                <!-- Window Windowpane cross -->
+                <div class="absolute inset-x-0 top-1/2 h-1 bg-white/70"></div>
+                <div class="absolute inset-y-0 left-1/2 w-1 bg-white/70"></div>
+            </div>
+
+            <!-- Wall Art Poster -->
+            <div class="absolute top-8 right-8 sm:right-16 w-16 h-20 sm:w-20 sm:h-24 bg-pink-100 border-4 border-white rounded-xl shadow-sm rotate-2 flex flex-col items-center justify-center text-center p-1">
+                <span class="text-2xl sm:text-3xl">🐾</span>
+                <span class="text-[9px] font-bold text-pink-500 uppercase tracking-tighter mt-1">Meow Love</span>
+            </div>
+
+            <!-- Bedside Lamp (Glows at Night) -->
+            <div class="absolute bottom-28 right-4 sm:right-10 flex flex-col items-center z-10 pointer-events-none">
+                <!-- Lamp Shade -->
+                <div class="w-12 h-10 bg-amber-100 border-2 border-amber-200 rounded-t-xl relative">
+                    <!-- Warm Glow effect -->
+                    <div class="lamp-light absolute -inset-4 bg-yellow-300/30 blur-lg rounded-full opacity-0 transition-opacity duration-700"></div>
+                </div>
+                <!-- Lamp Pole & Base -->
+                <div class="w-1.5 h-14 bg-amber-700"></div>
+                <div class="w-8 h-2 bg-amber-800 rounded-full"></div>
+            </div>
+
+            <!-- Cozy Floor Rug -->
+            <div class="absolute bottom-4 w-72 sm:w-96 h-28 sm:h-36 rounded-[50%] bg-pink-200/60 border-2 border-pink-300/40 shadow-inner flex items-center justify-center z-0">
+                <div class="w-56 sm:w-72 h-20 sm:h-28 rounded-[50%] border-2 border-dashed border-pink-300/60"></div>
+            </div>
+
+            <!-- Cat Food Bowl on Floor -->
+            <div class="absolute bottom-8 left-12 sm:left-24 z-10 flex flex-col items-center group cursor-pointer" onclick="document.getElementById('btnFeed').click()">
+                <div class="text-2xl group-hover:scale-125 transition-transform drop-shadow">🥣</div>
+                <span class="text-[10px] font-bold text-amber-800/60 mt-0.5">Bát ăn</span>
+            </div>
+
+            <!-- CENTRAL CAT CONTAINER -->
+            <div id="catContainer" class="relative z-20 mb-8 sm:mb-10">
+                <!-- Cat SVG will be rendered here dynamically by cat.js -->
+            </div>
+
+            <!-- Mini-Game Overlay (Yarn Chase) -->
+            <div id="miniGameOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden flex-col justify-between p-4 pointer-events-auto">
+                <div class="flex items-center justify-between text-white font-bold text-sm sm:text-base">
+                    <span id="miniGameScore" class="bg-pink-600 px-3 py-1 rounded-full shadow transition-all">Điểm: 0</span>
+                    <span class="text-xs bg-black/40 px-3 py-1 rounded-full">Nhấp vào cuộn len để bắt! 🧶</span>
+                    <span id="miniGameTimer" class="bg-amber-500 px-3 py-1 rounded-full shadow">Thời gian: 12s</span>
+                </div>
+                <!-- Bouncing Yarn Ball -->
+                <div id="yarnBall" class="yarn-ball absolute w-14 h-14 rounded-full bg-gradient-to-br from-rose-400 to-red-600 flex items-center justify-center text-2xl select-none" style="left: 50%; top: 50%;">
+                    🧶
+                </div>
+            </div>
+
+            <!-- Food Picker Tray Popup -->
+            <div id="foodTray" class="absolute bottom-24 bg-white/95 backdrop-blur-md rounded-3xl p-3 border-2 border-pink-200 shadow-2xl z-40 hidden flex gap-2 sm:gap-3 animate-bounce-short">
+                <!-- Food 1: Salmon (Free) -->
+                <button class="food-item-btn flex flex-col items-center bg-orange-50 hover:bg-orange-100 border border-orange-200 p-2 sm:p-2.5 rounded-2xl transition-transform active:scale-95" data-food="salmon">
+                    <span class="text-3xl">🐟</span>
+                    <span class="text-[11px] font-bold text-orange-800 mt-1">Cá hồi</span>
+                    <span class="text-[9px] font-bold text-emerald-600">+28% No</span>
+                    <span class="text-[9px] text-slate-500">Miễn phí</span>
+                </button>
+                <!-- Food 2: Milk (Free) -->
+                <button class="food-item-btn flex flex-col items-center bg-blue-50 hover:bg-blue-100 border border-blue-200 p-2 sm:p-2.5 rounded-2xl transition-transform active:scale-95" data-food="milk">
+                    <span class="text-3xl">🥛</span>
+                    <span class="text-[11px] font-bold text-blue-800 mt-1">Sữa tươi</span>
+                    <span class="text-[9px] font-bold text-emerald-600">+18% No</span>
+                    <span class="text-[9px] text-slate-500">Miễn phí</span>
+                </button>
+                <!-- Food 3: Donut (10 coins) -->
+                <button class="food-item-btn flex flex-col items-center bg-pink-50 hover:bg-pink-100 border border-pink-200 p-2 sm:p-2.5 rounded-2xl transition-transform active:scale-95" data-food="treat">
+                    <span class="text-3xl">🍩</span>
+                    <span class="text-[11px] font-bold text-pink-800 mt-1">Bánh cá</span>
+                    <span class="text-[9px] font-bold text-pink-600">+25% Vui</span>
+                    <span class="text-[9px] font-bold text-amber-600">🪙 10 vàng</span>
+                </button>
+                <!-- Food 4: Chicken (20 coins) -->
+                <button class="food-item-btn flex flex-col items-center bg-amber-50 hover:bg-amber-100 border border-amber-200 p-2 sm:p-2.5 rounded-2xl transition-transform active:scale-95" data-food="chicken">
+                    <span class="text-3xl">🍗</span>
+                    <span class="text-[11px] font-bold text-amber-800 mt-1">Đùi gà</span>
+                    <span class="text-[9px] font-bold text-emerald-600">+42% No</span>
+                    <span class="text-[9px] font-bold text-amber-600">🪙 20 vàng</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom Controls & Stats Section -->
+    <footer class="w-full max-w-3xl mx-auto p-3 sm:p-4 z-40 flex flex-col gap-3">
+        
+        <!-- Stats Panel (Hunger, Happiness, Energy) -->
+        <div class="glass-panel rounded-3xl p-3 sm:p-4 shadow-sm grid grid-cols-3 gap-2 sm:gap-4">
+            
+            <!-- Hunger Stat -->
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between text-xs font-bold text-orange-600 dark:text-orange-300">
+                    <span class="flex items-center gap-1">🐟 Độ no</span>
+                    <span id="hungerValue">80%</span>
+                </div>
+                <div class="w-full bg-orange-100 dark:bg-slate-700 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                    <div id="hungerBar" class="stat-bar-fill h-full rounded-full bg-orange-500 w-[80%]"></div>
+                </div>
+            </div>
+
+            <!-- Happiness Stat -->
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between text-xs font-bold text-pink-600 dark:text-pink-300">
+                    <span class="flex items-center gap-1">💖 Độ vui</span>
+                    <span id="happinessValue">85%</span>
+                </div>
+                <div class="w-full bg-pink-100 dark:bg-slate-700 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                    <div id="happinessBar" class="stat-bar-fill h-full rounded-full bg-pink-500 w-[85%]"></div>
+                </div>
+            </div>
+
+            <!-- Energy Stat -->
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-300">
+                    <span class="flex items-center gap-1">⚡ Năng lượng</span>
+                    <span id="energyValue">90%</span>
+                </div>
+                <div class="w-full bg-amber-100 dark:bg-slate-700 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                    <div id="energyBar" class="stat-bar-fill h-full rounded-full bg-yellow-500 w-[90%]"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 4 Primary Interaction Action Buttons -->
+        <div class="grid grid-cols-4 gap-2 sm:gap-3">
+            
+            <!-- Feed Button -->
+            <button id="btnFeed" class="btn-action glass-panel rounded-3xl py-2.5 sm:py-3 flex flex-col items-center justify-center gap-1 shadow-sm border border-orange-200 group">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                    🐟
+                </div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Cho ăn</span>
+            </button>
+
+            <!-- Play Mini-Game Button -->
+            <button id="btnPlay" class="btn-action glass-panel rounded-3xl py-2.5 sm:py-3 flex flex-col items-center justify-center gap-1 shadow-sm border border-pink-200 group">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                    🧶
+                </div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Chơi đùa</span>
+            </button>
+
+            <!-- Pet Button -->
+            <button id="btnPet" class="btn-action glass-panel rounded-3xl py-2.5 sm:py-3 flex flex-col items-center justify-center gap-1 shadow-sm border border-rose-200 group">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                    ❤️
+                </div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Vuốt ve</span>
+            </button>
+
+            <!-- Sleep Button -->
+            <button id="btnSleep" class="btn-action glass-panel rounded-3xl py-2.5 sm:py-3 flex flex-col items-center justify-center gap-1 shadow-sm border border-indigo-200 group">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                    🌙
+                </div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Đi ngủ</span>
+            </button>
+
+        </div>
+    </footer>
+
+    <!-- Wardrobe & Customization Modal -->
+    <div id="wardrobeModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-4 border-2 border-white animate-scale-up">
+            <div class="flex items-center justify-between border-b pb-3 border-pink-100">
+                <h3 class="text-lg font-bold text-pink-600 flex items-center gap-2">
+                    <span>🎀</span> Tủ Đồ & Phụ Kiện
+                </h3>
+                <button id="btnCloseWardrobe" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <!-- Fur Color Picker -->
+            <div>
+                <label class="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Màu Lông Mèo:</label>
+                <div class="grid grid-cols-5 gap-2">
+                    <button class="fur-btn flex flex-col items-center p-2 rounded-2xl bg-amber-100 hover:bg-amber-200 transition-all text-xs font-bold" data-color="orange">
+                        <span class="w-6 h-6 rounded-full bg-[#FFB067] border-2 border-white shadow-sm mb-1"></span>
+                        Vàng Cam
+                    </button>
+                    <button class="fur-btn flex flex-col items-center p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 transition-all text-xs font-bold" data-color="white">
+                        <span class="w-6 h-6 rounded-full bg-white border-2 border-slate-300 shadow-sm mb-1"></span>
+                        Trắng Tuyết
+                    </button>
+                    <button class="fur-btn flex flex-col items-center p-2 rounded-2xl bg-slate-200 hover:bg-slate-300 transition-all text-xs font-bold" data-color="black">
+                        <span class="w-6 h-6 rounded-full bg-[#334155] border-2 border-white shadow-sm mb-1"></span>
+                        Tuxedo
+                    </button>
+                    <button class="fur-btn flex flex-col items-center p-2 rounded-2xl bg-orange-100 hover:bg-orange-200 transition-all text-xs font-bold" data-color="calico">
+                        <span class="w-6 h-6 rounded-full bg-[#EA580C] border-2 border-white shadow-sm mb-1"></span>
+                        Tam Thể
+                    </button>
+                    <button class="fur-btn flex flex-col items-center p-2 rounded-2xl bg-pink-100 hover:bg-pink-200 transition-all text-xs font-bold" data-color="pink">
+                        <span class="w-6 h-6 rounded-full bg-[#FFC6D9] border-2 border-white shadow-sm mb-1"></span>
+                        Sakura
+                    </button>
+                </div>
+            </div>
+
+            <!-- Accessories Picker -->
+            <div>
+                <label class="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Phụ Kiện:</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700" data-acc="none">
+                        <span>❌</span> Không có
+                    </button>
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-bold text-rose-700" data-acc="bow">
+                        <span>🎀</span> Nơ Đỏ
+                    </button>
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-bold text-purple-700" data-acc="party">
+                        <span>🎉</span> Mũ Tiệc
+                    </button>
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-xs font-bold text-amber-700" data-acc="crown">
+                        <span>👑</span> Vương Miện
+                    </button>
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold text-emerald-700" data-acc="chef">
+                        <span>👨‍🍳</span> Đầu Bếp
+                    </button>
+                    <button class="acc-btn flex items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-blue-700" data-acc="glasses">
+                        <span>🕶️</span> Kính Râm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="gameToast" class="fixed bottom-24 left-1/2 -translate-x-1/2 glass-panel px-4 py-2.5 rounded-2xl shadow-xl border-2 border-pink-300 flex items-center gap-2 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none z-50 text-slate-800">
+        <span class="text-xl">🐾</span>
+        <span class="text-sm font-semibold">Chào mừng bạn!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="cat.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
